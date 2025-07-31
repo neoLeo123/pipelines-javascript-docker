@@ -5,6 +5,12 @@
 trigger:
 - main
 
+pool: my-self-hosted-agents  # Name of your agent pool
+steps:
+  - script: kubectl get nodes
+    displayName: "Verify AKS Access"
+
+    
 resources:
 - repo: self
 
