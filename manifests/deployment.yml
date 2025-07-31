@@ -16,4 +16,4 @@ spec:
         - name: neoleopipelinesjavascriptdocker 
           image: mya2registry.azurecr.io/neoleopipelinesjavascriptdocker
           ports:
-          - containerPort: 3000
+          - containerPort: 8080
