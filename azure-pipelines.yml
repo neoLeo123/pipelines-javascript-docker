@@ -1,21 +1,10 @@
-# Deploy to Azure Kubernetes Service
-# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
 - main
-
-pool: my-self-hosted-agents  # Name of your agent pool
-steps:
-  - script: kubectl get nodes
-    displayName: "Verify AKS Access"
-
     
 resources:
 - repo: self
 
 variables:
-
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'a515dd8f-db9b-444a-afa8-694f60daedc2'
   imageRepository: 'neoleopipelinesjavascriptdocker'
@@ -23,9 +12,6 @@ variables:
   dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
   imagePullSecret: 'mya2registryf09c-auth'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
 
   # Name of the new namespace being created to deploy the PR changes.
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
@@ -36,8 +22,7 @@ stages:
   jobs:
   - job: Build
     displayName: Build
-    pool:
-      vmImage: $(vmImageName)
+    pool: my-self-hosted-agents  # Changed to use your self-hosted agent
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -52,6 +37,10 @@ stages:
     - upload: manifests
       artifact: manifests
 
+    # Verification step added
+    - script: kubectl get nodes
+      displayName: "Verify AKS Access"
+
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build
@@ -60,8 +49,7 @@ stages:
   - deployment: Deploy
     condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
     displayName: Deploy
-    pool:
-      vmImage: $(vmImageName)
+    pool: my-self-hosted-agents  # Changed to use your self-hosted agent
     environment: 'neoLeo123pipelinesjavascriptdocker.default'
     strategy:
       runOnce:
@@ -89,8 +77,7 @@ stages:
   - deployment: DeployPullRequest
     displayName: Deploy Pull request
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/pull/'))
-    pool:
-      vmImage: $(vmImageName)
+    pool: my-self-hosted-agents  # Changed to use your self-hosted agent
 
     environment: 'neoLeo123pipelinesjavascriptdocker.$(k8sNamespaceForPR)'
     strategy:
