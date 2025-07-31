@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: neoleopipelinesjavascriptdocker 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neoleopipelinesjavascriptdocker
+  template:
+    metadata:
+      labels:
+        app: neoleopipelinesjavascriptdocker 
+    spec:
+      containers:
+        - name: neoleopipelinesjavascriptdocker 
+          image: mya2registry.azurecr.io/neoleopipelinesjavascriptdocker
+          ports:
+          - containerPort: 8080
